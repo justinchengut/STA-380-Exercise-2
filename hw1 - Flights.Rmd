@@ -1,0 +1,38 @@
+---
+title: "hw1 - Flights at AIBA"
+output: pdf_document
+---
+
+# Read the csv file
+We start off by reading the CSV file in, and then attaching data we read in to R so that other functions can use this data without calling it by name.
+```{r}
+flightdata <- read.csv("data/ABIA.csv")
+attach(flightdata)
+```
+
+
+# Graph Delays based on day of the week
+Next, we aggregrate based on departure delay and arrival delay based on day of week and graph the results.
+```{r}
+aggdepdelay = aggregate(DepDelay,by = list(DayOfWeek), FUN = mean, na.rm= TRUE)
+aggarrdelay = aggregate(ArrDelay,by = list(DayOfWeek), FUN = mean, na.rm= TRUE)
+
+
+plot(aggdepdelay$x, type ="l", xlab = "Day of the Week", ylab = "Average minutes of Delay", col = "red", lwd = 3, ylim = c(1,30), main = " Average departure and arrival delays" )
+lines(aggarrdelay$x, type = "l", col = "blue", lwd = 3)
+legend ("topright", c("Departure Delay", "Arrival Delay"), lty = 1, col = c('red','blue'))
+```
+
+From this, we can see that departure and arrival delay seem to follow the same trend based on day of the week, and that the first, fifth, and seventh day of thwe week seem to see high average minutes of delay than the other days of the week. 
+Also, it is interesting to note that the average departure delay is consistently higher than the average arrival delay in the Austin Airport, suggesting that the Austin Airport is worse than average at leaving on-time, since otherwise, one would expect the average arrival delay to be larger than the average departure delay.
+
+# Graph Distance traveled per day of the week
+Next, we compare the average distance traveled per day of we week.
+```{r}
+aggdistance = aggregate(Distance,by = list(DayOfWeek), FUN = mean, na.rm= TRUE)
+
+
+plot(aggdistance$x, type ="l", xlab = "Day of the Week", ylab = "Average Distance", col = "red", lwd = 3, main = "Average Distance Traveled per Day of Week" )
+```
+
+From this graph, we can see that most days have a similar average distance traveled, except for day 6, which seems to have a significantly higher average distance traveled.  This is likely due to people needing to make longer distance travel during the start of the weekend and airlines accomondating for this and generating more longer distance flights compared to other days of the week.

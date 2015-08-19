@@ -1,0 +1,41 @@
+---
+output: pdf_document
+---
+# Reading the data
+First, we use the library "arules" as it is necessary to do association rule mining.  Next, we use read.transactions on groceries.txt, separating based on comma and setting a basket format.
+```{r}
+library(arules)  # has a big ecosystem of packages built around it
+groceries <- read.transactions("data/groceries.txt", format = 'basket', sep = ',')
+
+```
+
+# Creating the rules
+Next, we run the apriori algorithm on the groceries data.
+A support of .005 means that the algorithm will filter out any item sets that do not occur in at least .005 of the transactions.  The confidence of .55 means that the left hand side will result in the right hand side at least 55% of the time.  Finally, the maxlen of 5 means that the total number of items in both the right hand side and the left hand side can add up to at most 5.
+```{r}
+groceriesrules <- apriori(groceries, parameter=list(support=.005, confidence=.59, maxlen=5))
+                         
+# Look at the output
+inspect(groceriesrules)
+```
+
+Looking at the output, we can see that 23 rules were generated.  Also, the right hand side always has only one item in it, and is either whole milk or other vegatables.  This is a rather large set of rules, so we create subsets next to narrow down the number of rules.
+
+# Creating a subset based on lift
+Next, we create a subset using a lift of at least 3.
+```{r}
+## Choose a subset
+inspect(subset(groceriesrules, subset=lift > 3))
+```
+
+This subset contains only 4 rules, and the right hand side is always other vegetables. With this subset, we can that people who buy a variety of types of fruit and vegetables are also likely to buy other types of vegetables.
+
+# Creating a subset based on confidence
+
+Next, we create a subset based on confidence, using a confidence of .65.  
+```{r}
+inspect(subset(groceriesrules, subset=confidence > 0.65))
+```
+This subset contains just three rules, and the right hand side is always whole milk.  Therefore, we can infer that whole milk is the most common item to be included if we know about certain other items in the grocery basket.
+
+
